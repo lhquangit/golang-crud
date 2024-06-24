@@ -10,9 +10,13 @@ func InitRouter() *mux.Router {
     r := mux.NewRouter()
     // Định nghĩa route cho trang chủ để kiểm tra
     r.HandleFunc("/", HomeHandler).Methods("GET")
+
+    // User route
     r.HandleFunc("/api/users", controller.GetAllUsers).Methods("GET")
-    // r.HandleFunc("/api/users", controller.CreateUser).Methods("POST")
-    // Các route khác cho Post và Tag
+    r.HandleFunc("/api/users", controller.CreateUser).Methods("POST")
+    
+    // Post route
+    r.HandleFunc("/api/posts", controller.GetAllPosts).Methods("Get")
     return r
 }
 
