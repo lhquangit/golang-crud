@@ -6,6 +6,7 @@ import (
 )
 
 var DB_url string
+var JWTSecret string
 
 func LoadConfig(){
 	viper.SetConfigFile(".env")
@@ -14,4 +15,5 @@ func LoadConfig(){
 	}
 
 	DB_url = viper.GetString("DATABASE_URL")
+	JWTSecret = viper.GetString("JWT_SECRET_KEY")
 }

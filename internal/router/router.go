@@ -1,9 +1,11 @@
 package router
 
 import (
-    "github.com/gorilla/mux"
-    "go-crud/internal/controller"
-    "net/http"
+	"go-crud/internal/controller"
+	"go-crud/internal/model"
+	"go-crud/middleware"
+	"net/http"
+	"github.com/gorilla/mux"
 )
 
 func InitRouter() *mux.Router {
@@ -11,12 +13,23 @@ func InitRouter() *mux.Router {
     // Định nghĩa route cho trang chủ để kiểm tra
     r.HandleFunc("/", HomeHandler).Methods("GET")
 
-    // User route
-    r.HandleFunc("/api/users", controller.GetAllUsers).Methods("GET")
-    r.HandleFunc("/api/users", controller.CreateUser).Methods("POST")
+    // Public routes
+    r.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+                        controller.Login(w,r,model.DB)}).Methods("POST")
+ 
+    // Protected routes
+    api := r.PathPrefix("/api").Subrouter()
+    api.Use(middleware.JWTAuthMiddleware)
     
-    // Post route
-    r.HandleFunc("/api/posts", controller.GetAllPosts).Methods("Get")
+    // Admin routes
+    admin := api.PathPrefix("/admin").Subrouter()
+    admin.Use(middleware.AdminOnly)
+    admin.HandleFunc("/create_user", controller.CreateUser(model.DB)).Methods("POST") // Create user
+    
+    // User routes
+    // api.Use(middleware.Authenticate)
+    api.HandleFunc("/users", controller.GetAllUsers).Methods("GET") // Get all users
+    api.HandleFunc("/posts", controller.GetAllPosts).Methods("Get") // Get all posts
     return r
 }
 
